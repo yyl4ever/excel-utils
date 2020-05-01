@@ -12,6 +12,7 @@ import lombok.experimental.Accessors;
 
 @Data
 @AllArgsConstructor
+// 链式setter https://blog.csdn.net/weixin_38229356/article/details/82937420
 @Accessors(chain = true)
 public class ExcelHeaderInfo {
 
@@ -21,7 +22,7 @@ public class ExcelHeaderInfo {
     private int lastRow;
     //标题的首列坐标
     private int firstCol;
-    //标题的首行坐标
+    //标题的末列坐标
     private int lastCol;
     // 标题
     private String title;

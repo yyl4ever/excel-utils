@@ -32,8 +32,17 @@ public class ExcelUtils {
     public static final int ROW_ACCESS_WINDOW_SIZE = 100;
     public static final int SHEET_MAX_ROW = 100000;
 
+    /**
+     * 保存待导出的数据
+     */
     private List list;
+    /**
+     * 保存表头信息
+     */
     private List<ExcelHeaderInfo> excelHeaderInfos;
+    /**
+     * 格式化字段
+     */
     private Map<String, ExcelFormat> formatInfo;
 
     public ExcelUtils(List list, List<ExcelHeaderInfo> excelHeaderInfos) {
@@ -79,6 +88,7 @@ public class ExcelUtils {
 
     // 创建表头
     private void createHeader(Sheet sheet, CellStyle style) {
+        // 分类、品牌、品牌ID等多个表头
         for (ExcelHeaderInfo excelHeaderInfo : excelHeaderInfos) {
             Integer lastRow = excelHeaderInfo.getLastRow();
             Integer firstRow = excelHeaderInfo.getFirstRow();
@@ -96,6 +106,7 @@ public class ExcelUtils {
             // 赋值单元格
             cell.setCellValue(excelHeaderInfo.getTitle());
             cell.setCellStyle(style);
+            // todo  what for?
             sheet.setColumnWidth(firstCol, sheet.getColumnWidth(firstCol) * 17 / 12);
         }
     }
@@ -138,8 +149,10 @@ public class ExcelUtils {
     // 将原始数据转成二维数组
     private String[][] transformData() {
         int dataSize = this.list.size();
+        // dataSize 条记录就设置 dataSize 行
         String[][] datas = new String[dataSize][];
-        // 获取报表的列数
+        // 获取报表的列数 (获取实体类的所有字段，从而间接知道一共多少列)
+        // todo 可以提取出来成为成员变量，避免每次都反射获取字段
         Field[] fields = list.get(0).getClass().getDeclaredFields();
         // 获取实体类的字段名称数组
         List<String> columnNames = this.getBeanProperty(fields);
@@ -147,7 +160,8 @@ public class ExcelUtils {
             datas[i] = new String[fields.length];
             for (int j = 0; j < fields.length; j++) {
                 try {
-                    // 赋值
+                    // 赋值 BeanUtils 很方便的帮助我们对一个实体类进行字段的赋值与字段值的获取
+                    // 获取实体list.get(i)中名称为columnNames.get(j)这个字段的值
                     datas[i][j] = BeanUtils.getProperty(list.get(i), columnNames.get(j));
                 } catch (Exception e) {
                     LOGGER.error("获取对象属性值失败");
@@ -162,6 +176,7 @@ public class ExcelUtils {
     private List<String> getBeanProperty(Field[] fields) {
         List<String> columnNames = new ArrayList<>();
         for (Field field : fields) {
+            // todo 这里可以直接获取到名字 field.getName()
             String[] strings = field.toString().split("\\.");
             String columnName = strings[strings.length - 1];
             columnNames.add(columnName);

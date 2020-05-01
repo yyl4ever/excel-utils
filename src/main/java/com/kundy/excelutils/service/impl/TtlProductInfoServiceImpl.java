@@ -24,7 +24,7 @@ import java.util.concurrent.FutureTask;
 public class TtlProductInfoServiceImpl implements TtlProductInfoService {
 
     // 每个线程导出记录最大行数
-    private static final int THREAD_MAX_ROW = 20000;
+    private static final int MAX_ROW_PER_THREAD = 20000;
 
     @Autowired
     private TtlProductInfoMapper mapper;
@@ -88,8 +88,10 @@ public class TtlProductInfoServiceImpl implements TtlProductInfoService {
         List<FutureTask<List<TtlProductInfoPo>>> tasks = new ArrayList<>();
         List<TtlProductInfoPo> productInfoPos = new ArrayList<>();
 
+        // todo 这里可以select(*)获取实际的记录数
         int totalNum = 500000;
-        int loopNum = new Double(Math.ceil((double) totalNum / THREAD_MAX_ROW)).intValue();
+        // todo 应该取系统的CPU核心数
+        int loopNum = new Double(Math.ceil((double) totalNum / MAX_ROW_PER_THREAD)).intValue();
         log.info("多线程查询，总数：{},开启线程数：{}", totalNum, loopNum);
         long start = System.currentTimeMillis();
 
@@ -97,10 +99,14 @@ public class TtlProductInfoServiceImpl implements TtlProductInfoService {
 
         for (FutureTask<List<TtlProductInfoPo>> task : tasks) {
             try {
+                // 多用户同时导出大数据量时 productInfoPos.addAll 这里可能内存溢出
                 productInfoPos.addAll(task.get());
             } catch (Exception e) {
                 e.printStackTrace();
             }
+            /*while(task.isDone()){
+                productInfoPos.addAll(task.get());
+            }*/
         }
 
         log.info("查询结束，耗时:{}", System.currentTimeMillis() - start);
@@ -111,14 +117,15 @@ public class TtlProductInfoServiceImpl implements TtlProductInfoService {
     private void executeTask(List<FutureTask<List<TtlProductInfoPo>>> tasks, int loopNum, int total) {
         for (int i = 0; i < loopNum; i++) {
             Map<String, Object> map = new HashMap<>();
-            map.put("offset", i * THREAD_MAX_ROW);
+            map.put("offset", i * MAX_ROW_PER_THREAD);
             if (i == loopNum - 1) {
-                map.put("limit", total - THREAD_MAX_ROW * i);
+                map.put("limit", total - MAX_ROW_PER_THREAD * i);
             } else {
-                map.put("limit", THREAD_MAX_ROW);
+                map.put("limit", MAX_ROW_PER_THREAD);
             }
             FutureTask<List<TtlProductInfoPo>> task = new FutureTask<>(new listThread(map));
-            log.info("开始查询第{}条开始的{}条记录", i * THREAD_MAX_ROW, THREAD_MAX_ROW);
+            log.info("开始查询第{}条开始的{}条记录", i * MAX_ROW_PER_THREAD, MAX_ROW_PER_THREAD);
+            // todo 这里可以用线程池来优化
             new Thread(task).start();
             // 将任务添加到tasks列表中
             tasks.add(task);

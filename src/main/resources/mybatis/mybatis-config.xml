@@ -3,6 +3,7 @@
 <configuration>
 
     <settings>
+        <!--将下划线映射为驼峰-->
         <setting name="mapUnderscoreToCamelCase" value="true"/>
     </settings>
 
