@@ -1,6 +1,8 @@
 copy from https://github.com/dearKundy/excel-utils
 
 这个工具的亮点在于可以自由设置表头，因为将表头和数据进行解耦。
+
+相关代码：com.kundy.excelutils.controller.ExportController
 ### 前言
 公司项目最近有一个需要：报表导出。整个系统下来，起码超过一百张报表需要导出。这个时候如何优雅的实现报表导出，释放生产力就显得很重要了。下面主要给大家分享一下该工具类的使用方法与实现思路。
 

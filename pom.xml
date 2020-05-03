@@ -14,10 +14,12 @@
     <artifactId>excel-utils</artifactId>
     <version>0.0.1-SNAPSHOT</version>
     <name>excel-utils</name>
-    <description>excel导出工具类</description>
+    <description>excel操作工具类</description>
 
     <properties>
         <java.version>1.8</java.version>
+        <commons_lang_version>2.5</commons_lang_version>
+        <commons_lang3_version>3.8.1</commons_lang3_version>
     </properties>
 
     <dependencies>
@@ -76,6 +78,25 @@
             <groupId>commons-beanutils</groupId>
             <artifactId>commons-beanutils</artifactId>
             <version>1.9.3</version>
+        </dependency>
+
+        <dependency>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-lang3</artifactId>
+            <version>${commons_lang3_version}</version>
+        </dependency>
+
+        <dependency>
+            <groupId>commons-lang</groupId>
+            <artifactId>commons-lang</artifactId>
+            <version>${commons_lang_version}</version>
+        </dependency>
+
+        <!-- https://mvnrepository.com/artifact/org.yaml/snakeyaml -->
+        <dependency>
+            <groupId>org.yaml</groupId>
+            <artifactId>snakeyaml</artifactId>
+            <version>1.25</version>
         </dependency>
 
     </dependencies>
